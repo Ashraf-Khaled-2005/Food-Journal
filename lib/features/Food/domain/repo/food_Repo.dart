@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:food_daily/features/Food/domain/entity/food_entity.dart';
 
 abstract class FoodRepo {
-  List<Either<Failure, List<FoodEntity>>> getData();
+  Future<Either<Failure, List<FoodEntity>>> getListData();
 }
 
 class Failure {
