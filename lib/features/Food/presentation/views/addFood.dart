@@ -12,6 +12,7 @@ class AddFood extends StatefulWidget {
 }
 
 class _AddFoodState extends State<AddFood> {
+  bool isloading = false;
   File? image;
   @override
   Widget build(BuildContext context) {
@@ -20,12 +21,19 @@ class _AddFoodState extends State<AddFood> {
         backgroundColor: Colors.blue,
         onPressed: () async {
           File? pickedImage = await showImagePicker(context);
-
+          setState(() {
+            isloading = true;
+          });
           if (pickedImage != null) {
+            image = pickedImage;
+            setState(() {});
             print("Image is not null");
           } else {
             print("NULL");
           }
+          setState(() {
+            isloading = false;
+          });
         },
         child: Icon(
           Icons.image_search_rounded,
@@ -41,7 +49,13 @@ class _AddFoodState extends State<AddFood> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: AddFoodBody(),
+        child: isloading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : AddFoodBody(
+                image: image,
+              ),
       ),
     );
   }

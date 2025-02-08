@@ -9,16 +9,15 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(FoodEntityAdapter());
+  await Hive.openBox<FoodEntity>('foods');
 
-  runApp(DevicePreview(builder: (context) => MyApp()));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      builder: DevicePreview.appBuilder,
-      locale: DevicePreview.locale(context),
       title: 'Flutter Demo',
       home: MyHomePage(),
     );

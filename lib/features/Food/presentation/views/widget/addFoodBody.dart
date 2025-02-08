@@ -1,13 +1,25 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:food_daily/features/Food/domain/entity/food_entity.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'CustomTextField.dart';
 import 'custombuttom.dart';
 
-class AddFoodBody extends StatelessWidget {
-  const AddFoodBody({super.key});
+class AddFoodBody extends StatefulWidget {
+  final File? image;
+  const AddFoodBody({super.key, required this.image});
 
+  @override
+  State<AddFoodBody> createState() => _AddFoodBodyState();
+}
+
+class _AddFoodBodyState extends State<AddFoodBody> {
+  bool isloading = false;
+  TextEditingController controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.sizeOf(context).height;
@@ -18,18 +30,55 @@ class AddFoodBody extends StatelessWidget {
         children: [
           SizedBox(
             height: height * 0.5,
-            child: Image.asset("assets/download.jpg"),
+            child: widget.image != null
+                ? Expanded(
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Image.file(
+                          widget.image!,
+                          fit: BoxFit.cover,
+                        )),
+                  )
+                : SizedBox(),
           ),
-          Center(child: CustomTextField()),
+          SizedBox(
+            height: 15,
+          ),
+          Center(child: CustomTextField(controller: controller)),
           SizedBox(
             height: 35,
           ),
-          CustomButton(
-            text: "Done",
-            onPressed: () {
-              // Add food to database
-            },
-          ),
+          isloading == true
+              ? Center(child: CircularProgressIndicator())
+              : CustomButton(
+                  text: "Done",
+                  onPressed: () async {
+                    setState(() {
+                      isloading = true;
+                    });
+                    if (widget.image != null) {
+                      final directory =
+                          await getApplicationDocumentsDirectory();
+                      final String path =
+                          '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+                      final File newImage =
+                          await File(widget.image!.path).copy(path);
+                      FoodEntity food = FoodEntity(
+                        data: DateTime.now().toString(),
+                        description: controller.text,
+                        imageUrl: newImage.path,
+                      );
+                      var box = Hive.box<FoodEntity>("foods");
+                      box.add(food);
+
+                      setState(() {
+                        isloading = false;
+                      });
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
         ],
       ),
     );
