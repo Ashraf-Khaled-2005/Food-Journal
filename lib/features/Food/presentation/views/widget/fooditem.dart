@@ -1,22 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:food_daily/features/Food/domain/entity/food_entity.dart';
+import 'package:intl/intl.dart';
 
 class FoodItem extends StatelessWidget {
-  const FoodItem({super.key});
+  final FoodEntity item;
+  const FoodItem({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
+    DateTime parsedDate = DateTime.parse(item.data);
     return ListTile(
       trailing: Text(
-        "21/2/2025",
+        DateFormat('').format(parsedDate),
         style: TextStyle(color: Colors.grey),
       ),
-      leading: Image.asset('assets/download.jpg'),
+      leading: Image.file(File(item.imageUrl)),
       title: Text(
-        'Food name',
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      subtitle: Text(
-        'Food description',
+        item.description,
         style: TextStyle(color: Colors.grey),
         maxLines: 2,
         overflow: TextOverflow.ellipsis,

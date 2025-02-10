@@ -2,10 +2,12 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:food_daily/features/Food/domain/entity/food_entity.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../manager/cubit/get_food_cubit.dart';
 import 'CustomTextField.dart';
 import 'custombuttom.dart';
 
@@ -64,17 +66,11 @@ class _AddFoodBodyState extends State<AddFoodBody> {
 
                       final File newImage =
                           await File(widget.image!.path).copy(path);
-                      FoodEntity food = FoodEntity(
-                        data: DateTime.now().toString(),
-                        description: controller.text,
-                        imageUrl: newImage.path,
-                      );
-                      var box = Hive.box<FoodEntity>("foods");
-                      box.add(food);
-
-                      setState(() {
-                        isloading = false;
-                      });
+                      BlocProvider.of<GetFoodCubit>(context).setfood(
+                          fooditem: FoodEntity(
+                              description: controller.text,
+                              imageUrl: path,
+                              data: DateTime.now().toString()));
                       Navigator.pop(context);
                     }
                   },
